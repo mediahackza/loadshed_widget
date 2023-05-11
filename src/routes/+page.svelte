@@ -96,7 +96,7 @@
 
     {#each promise as point, i}
         <rect y="{height-yScale(+point.hours)-padding.bottom}" x="{(i*(innerWidth/promise.length)) + padding.left}" width="{(innerWidth/promise.length) -10}" height="{yScale(+point.hours)}" style="fill:{colorScale(+point.hours)}"/>
-        <text text-anchor="middle" dominant-baseline="text-bottom" style="fill: #ffffff; font-size: 10px;" x="{(i*(innerWidth/promise.length))+((innerWidth/promise.length)/2)+5}" y="{height-yScale(+point.hours)-padding.bottom-2}" >{point.hours}</text>
+        <text text-anchor="middle" dominant-baseline="text-bottom" style="fill: #ffffff; font-size: 10px;" x="{(i*(innerWidth/promise.length))+((innerWidth/promise.length)/2)+5}" y="{height-yScale(+point.hours)-padding.bottom-2}" >{Math.ceil(+point.hours).toLocaleString()}</text>
         <text text-anchor="middle" dominant-baseline="text-bottom" style="fill: #ffffff; font-size: 10px;" x="{(i*(innerWidth/promise.length))+((innerWidth/promise.length)/2)+5}" y="{height}" >{formateDate(point.year)}</text> 
     {/each}
 
