@@ -90,8 +90,6 @@
 
 <div class="date">Since {date_since}</div>
 
-<div class="spacer"></div>
-
 <svg class="chart" width="{width}" height="{height}">
 
     {#each promise as point, i}
@@ -102,6 +100,8 @@
 
 
 </svg>
+
+<div ><a class="link" href="https://loadshed.theoutlier.co.za" target="_blank">https://loadshed.theoutlier.co.za</a></div>
 
 </div>
 
@@ -119,13 +119,18 @@
         text-align: center;
     }
 
-    .spacer {
-        height: 15px;
-    }
+    /* .spacer {
+        height: 2px;
+    } */
 
     .heading {
         font-size: 36px;
         
+    }
+
+    .link {
+        color: #ffffff;
+        text-decoration: none;
     }
 
     .sub-heading {
@@ -142,6 +147,7 @@
 
     .chart-text {
         color: #ffffff;
+        
     }
 
 </style>
