@@ -13,7 +13,7 @@
     let padding = {
         top: 20,
         right: 10,
-        bottom: 20,
+        bottom: 12,
         left: 10
     };
 
@@ -34,8 +34,10 @@
             fetch("https://api.datadesk.co.za/json.php?table=dd_loadsheddingmhc_6163407")
             .then(res => res.json())
             .then(data => {
+                console.log(data[1])
                 stage = data[1].stage;
-                date_since = data[1].date_since;
+                date_since = string_date(data[1].start_time.split(" ")[0]);
+                console.log("date since is: ", date_since);
                 console.log("stage is: ", stage)
             });
 
@@ -48,11 +50,11 @@
 
         });
     // })
-    
-    
+    $: innerHeight = height - (padding.top + padding.bottom);
+
     $: yScale = scaleLinear()
     .domain([0,4000])
-    .range([0, height])
+    .range([0, innerHeight])
 
     $: colorScale = scaleLinear()
     .domain([0, 4000])
@@ -63,6 +65,20 @@
 
     // $: data = points.length == 0 ? true : false;
 
+    const formateDate = (date) => {
+        let date_form = date.substr(2);   
+        date_form = "'" + date_form;
+        return date_form
+    }
+
+    const string_date = (date) => {
+        let date_obj = new Date(date);
+
+        let month = date_obj.toLocaleString([], { month: 'long' });
+        let res = date_obj.getDate().toString() + " " + month + " " + date_obj.getFullYear().toString();
+        return res;
+    }
+
 
 </script>
 
@@ -72,14 +88,16 @@
 
 <div class="stage" style="color: {colors[+stage]} !important;"><strong>{stage}</strong></div>
 
-<div class="date">Since 2023-05-07</div>
+<div class="date">Since {date_since}</div>
 
 <div class="spacer"></div>
 
 <svg class="chart" width="{width}" height="{height}">
 
     {#each promise as point, i}
-        <rect y="{height-yScale(+point.hours)}" x="{(i*(innerWidth/promise.length)) + padding.left}" width="{(innerWidth/promise.length) -10}" height="{yScale(+point.hours)}" style="fill:{colorScale(+point.hours)}"/>
+        <rect y="{height-yScale(+point.hours)-padding.bottom}" x="{(i*(innerWidth/promise.length)) + padding.left}" width="{(innerWidth/promise.length) -10}" height="{yScale(+point.hours)}" style="fill:{colorScale(+point.hours)}"/>
+        <text text-anchor="middle" dominant-baseline="text-bottom" style="fill: #ffffff; font-size: 10px;" x="{(i*(innerWidth/promise.length))+((innerWidth/promise.length)/2)+5}" y="{height-yScale(+point.hours)-padding.bottom-2}" >{point.hours}</text>
+        <text text-anchor="middle" dominant-baseline="text-bottom" style="fill: #ffffff; font-size: 10px;" x="{(i*(innerWidth/promise.length))+((innerWidth/promise.length)/2)+5}" y="{height}" >{formateDate(point.year)}</text> 
     {/each}
 
 
@@ -120,6 +138,10 @@
 
     .chart {
         /* border: 1px solid blue; */
+    }
+
+    .chart-text {
+        color: #ffffff;
     }
 
 </style>
