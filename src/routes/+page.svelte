@@ -149,5 +149,3 @@
         color: #ffffff;
         
     }
-
-</style>
