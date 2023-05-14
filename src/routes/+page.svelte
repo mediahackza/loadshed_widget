@@ -1,7 +1,11 @@
 <script>
   import '../styles.css'
   import { scaleLinear } from 'd3-scale'
+  import { timeParse, timeFormat } from 'd3-time-format'
   import { onMount } from 'svelte'
+
+  let parseDate = timeParse('%Y-%m-%d %H:%M:%S')
+  let formatDate = timeFormat('%-d %b %-I:%M %p')
 
   const colors = [
     '#19A900',
@@ -15,6 +19,7 @@
 
   let stage = 6
   let date_since = ''
+  let latestDate = ''
   let promise = []
 
   let yTicks = []
@@ -32,26 +37,17 @@
     yTicks.push(i)
   }
 
-  // onMount( async () => {
-
   onMount(async () => {
-    fetch(
-      'https://api.datadesk.co.za/json.php?table=dd_loadsheddingmhc_6163407'
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data[1])
-        stage = data[1].stage
-        date_since = string_date(data[1].start_time.split(' ')[0])
-        console.log('date since is: ', date_since)
-        console.log('stage is: ', stage)
-      })
-
     fetch('https://mediaverse.mediahack.co.za/api/loadshedding/stats.php')
       .then((res) => res.json())
       .then((data) => {
+        data.latest.forEach((d) => {
+          d.fullDate = parseDate(d.start_time)
+        })
+
         promise = data.years
-        // console.log('promise is: ', promise)
+        stage = data.latest[0].stage
+        latestDate = formatDate(data.latest[0].fullDate)
       })
   })
   // })
@@ -70,19 +66,6 @@
     let date_form = date.substr(2)
     date_form = '20' + date_form
     return date_form
-  }
-
-  const string_date = (date) => {
-    let date_obj = new Date(date)
-
-    let month = date_obj.toLocaleString([], { month: 'long' })
-    let res =
-      date_obj.getDate().toString() +
-      ' ' +
-      month +
-      ' ' +
-      date_obj.getFullYear().toString()
-    return res
   }
 </script>
 
@@ -104,23 +87,31 @@
     </div>
   </div>
 
-  <!-- <div class="sub-heading">Stage</div>
-  <div class="stage" style="color: {colors[+stage]} !important;">
-    <strong>{stage}</strong>
-  </div> -->
-
-  <div class="date">Since {date_since}</div>
+  <div class="date">
+    Last update: <span class="highlight">{latestDate}</span>
+  </div>
 
   <div class="chart-wrap">
     <svg class="chart" {width} {height}>
+      <!-- Define the gradient -->
+      <!-- <linearGradient id="myGradient" x1="0" y1="0" x2="0" y2="1"> -->
+      <!-- Start with a transparent stop at the beginning -->
+      <!-- <stop offset="0" stop-opacity="1" stop-color="#eaaf00" /> -->
+      <!-- Add a solid stop at 75% of the width -->
+      <!-- <stop offset="0.7" stop-color="#eaaf00" /> -->
+      <!-- End with a transparent stop at the end -->
+      <!-- <stop offset="1" stop-opacity="1" stop-color="#eaaf00" /> -->
+      <!-- </linearGradient> -->
+
       {#each promise as point, i}
         <rect
           y={height - yScale(+point.hours) - padding.bottom}
           x={i * (innerWidth / promise.length) + padding.left}
           width={innerWidth / promise.length - 8}
           height={yScale(+point.hours)}
-          style="fill: gray;"
+          fill="#eaaf00"
         />
+        <!-- fill="url(#myGradient)" -->
         <!-- fill:{colorScale(+point.hours)} -->
         <text
           text-anchor="middle"
@@ -233,5 +224,13 @@
     font-size: 0.7rem;
     fill: gray;
     /* text-anchor: end; */
+  }
+  .highlight {
+    color: goldenrod;
+    font-weight: 700;
+  }
+
+  rect {
+    background-image: linear-gradient(red, yellow);
   }
 </style>
