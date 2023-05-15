@@ -26,7 +26,7 @@
   let padding = {
     top: 20,
     right: 20,
-    bottom: 12,
+    bottom: 30,
     left: 20,
   }
 
@@ -53,7 +53,7 @@
   // })
   $: innerHeight = height - (padding.top + padding.bottom)
 
-  $: yScale = scaleLinear().domain([0, 4000]).range([40, innerHeight])
+  $: yScale = scaleLinear().domain([0, 4000]).range([10, innerHeight])
 
   $: colorScale = scaleLinear().domain([0, 4000]).range(['#D3BE00', '#E31A1D'])
 
@@ -120,29 +120,31 @@
           x={i * (innerWidth / promise.length) +
             innerWidth / promise.length / 2 +
             15}
-          y={height - yScale(+point.hours) - padding.bottom - 10}
+          y={height - yScale(+point.hours) - padding.bottom - 7}
           >{Math.ceil(+point.hours).toLocaleString()}</text
         >
-        <text class="label" x="20" y={height / 3}
+        <text class="label" x="20" y={height + 2}
           >Hours of active loadshedding</text
         >
         <text
           text-anchor="middle"
           dominant-baseline="text-bottom"
-          style="fill: lightgray; font-size: 10px;"
+          class="axis axis-x"
           x={i * (innerWidth / promise.length) +
             innerWidth / promise.length / 2 +
             15}
-          y={height}>{formateDate(point.year)}</text
+          y={height - 15}>{formateDate(point.year)}</text
         >
       {/each}
     </svg>
   </div>
 
   <div class="baselink">
-    <a class="link" href="https://loadshed.theoutlier.co.za" target="_blank"
-      >https://loadshed.theoutlier.co.za</a
-    >
+    <div class="source">Data: Eskom se Push & The Outlier</div>
+    <div class="outlier-logo">
+      <span class="outlier-initial">The</span>
+      <span class="outlier-secondary">Outlier</span>
+    </div>
   </div>
 </div>
 
@@ -179,10 +181,13 @@
   }
   .baselink {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
+    right: 0px;
     width: 100%;
     font-size: 0.7rem;
     color: gray;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
   }
 
   .sub-heading {
@@ -222,15 +227,47 @@
   }
   .label {
     font-size: 0.7rem;
-    fill: gray;
+    fill: #eaaf00;
+    font-weight: 100;
+    letter-spacing: 0.03rem;
     /* text-anchor: end; */
   }
   .highlight {
-    color: goldenrod;
+    color: #eaaf00;
     font-weight: 700;
   }
 
   rect {
     background-image: linear-gradient(red, yellow);
+  }
+  svg {
+    overflow: visible;
+  }
+  .axis {
+    font-size: 0.6rem;
+    fill: rgb(185, 185, 185);
+    font-weight: 400;
+    /* letter-spacing: 0.03rem; */
+    /* text-anchor: end; */
+  }
+  .outlier-logo {
+    text-transform: uppercase;
+    font-weight: 600;
+    background: #da191a;
+    color: #fff;
+    padding: 1px 5px 2px 5px;
+    /* width: 100px; */
+  }
+  .outlier-initial {
+    /* color: #fff; */
+  }
+  .outlier-secondary {
+    /* color: #da191a; */
+  }
+  .source {
+    color: lightgray;
+    font-size: 0.6rem;
+    text-align: left;
+    padding-left: 10px;
   }
 </style>
