@@ -89,6 +89,7 @@
 </script>
 
 <div class="container" bind:clientWidth={width}>
+  {#if promise.length > 0}
   <div class="head-wrap" style="background: {colors[+stage]} !important;">
     {#if +stage === 6}
       <div class="heading" style="color: #fff;">
@@ -161,6 +162,8 @@
       <span class="outlier-secondary">Outlier</span>
     </div>
   </div>
+
+  {/if}
 </div>
 
 <style>
