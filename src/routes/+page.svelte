@@ -2,7 +2,8 @@
   // https://gist.github.com/mbostock/3019563https://gist.github.com/mbostock/3019563
 
   import '../styles.css'
-  import { scaleLinear } from 'd3-scale'
+  import { scaleLinear, scaleBand } from 'd3-scale'
+  import { max } from 'd3'
   import { timeParse, timeFormat } from 'd3-time-format'
   import { onMount } from 'svelte'
 
@@ -22,22 +23,19 @@
   let stage = 6
   let date_since = ''
   let latestDate = ''
-  let promise = []
+  let promise = [];
+  $: xDomain = [];
 
-  let yTicks = []
+  
   let padding = {
-    top: 20,
-    right: 20,
-    bottom: 30,
-    left: 20,
+    top: 10,
+    right: 10,
+    bottom: 10,
+    left: 10,
   }
 
   let width = 300
   let height = 150
-
-  for (let i = 200; i < 3200; i += 200) {
-    yTicks.push(i)
-  }
 
   onMount(async () => {
     fetch('https://mediaverse.mediahack.co.za/api/loadshedding/stats.php')
@@ -50,17 +48,35 @@
         promise = data.years
         stage = data.latest[0].stage
         latestDate = formatDate(data.latest[0].fullDate)
+        xDomain = promise.map((d) => {
+            return d.year
+        });
       })
   })
   // })
-  $: innerHeight = height - (padding.top + padding.bottom)
+  $: innerHeight = height - (padding.top + padding.bottom);
+  $: innerWidth = width - (padding.left + padding.right)
 
-  $: yScale = scaleLinear().domain([0, 4000]).range([10, innerHeight])
+  $: yScale = scaleLinear().domain([0, max(promise, (d) => {
+    return +d.hours
+  })])
+  .range([padding.bottom, innerHeight])
   // scaleBand
+
+  $: xScale = scaleBand().domain(promise.map(d => {
+    return d.year
+  }))
+  .range([padding.left, innerWidth])
+  .padding(0.2)
+//   $: test = xScale.bandwidth();
+  $: console.log("bandwidth test: ", xScale.bandwidth())
+  $: console.log("step test: ", xScale.step());
+
+  $: yTicks = yScale.ticks(16);
 
   $: colorScale = scaleLinear().domain([0, 4000]).range(['#D3BE00', '#E31A1D'])
 
-  $: innerWidth = width - (padding.left + padding.right)
+  
   $: barWidth = innerWidth / 10
 
   // $: data = points.length == 0 ? true : false;
@@ -72,7 +88,7 @@
   }
 </script>
 
-<div class="container">
+<div class="container" bind:clientWidth={width}>
   <div class="head-wrap" style="background: {colors[+stage]} !important;">
     {#if +stage === 6}
       <div class="heading" style="color: #fff;">
@@ -106,11 +122,11 @@
       <!-- <stop offset="1" stop-opacity="1" stop-color="#eaaf00" /> -->
       <!-- </linearGradient> -->
 
-      {#each promise as point, i}
+      {#each promise as point}
         <rect
-          y={height - yScale(+point.hours) - padding.bottom}
-          x={i * (innerWidth / promise.length) + padding.left}
-          width={innerWidth / promise.length - 8}
+          y={height - yScale(+point.hours)}
+          x={xScale(point.year)}
+          width={xScale.bandwidth()}
           height={yScale(+point.hours)}
           fill="#eaaf00"
         />
@@ -120,23 +136,19 @@
           text-anchor="middle"
           dominant-baseline="text-bottom"
           style="fill: #ffffff; font-size: 10px;"
-          x={i * (innerWidth / promise.length) +
-            innerWidth / promise.length / 2 +
-            15}
-          y={height - yScale(+point.hours) - padding.bottom - 7}
+          x={xScale(point.year) + xScale.bandwidth()/2}
+          y={height - yScale(+point.hours) - padding.top }
           >{Math.ceil(+point.hours).toLocaleString()}</text
         >
-        <text class="label" x="20" y={height + 2}
-          >Hours of active loadshedding</text
-        >
+        <text class="label" x="20" y={height + padding.bottom*2+ 2}
+          >Hours of active loadshedding</text>
+
         <text
           text-anchor="middle"
           dominant-baseline="text-bottom"
           class="axis axis-x"
-          x={i * (innerWidth / promise.length) +
-            innerWidth / promise.length / 2 +
-            15}
-          y={height - 15}>{formateDate(point.year)}</text
+          x={xScale(point.year) + xScale.bandwidth()/2}
+          y={height + padding.bottom}>{formateDate(point.year)}</text
         >
       {/each}
     </svg>
@@ -156,7 +168,8 @@
     position: relative;
     border-radius: 2px;
     background-color: #fff;
-    width: 300px;
+    min-width: 250px;
+    max-width: 600px;
     height: 300px;
     padding: 0px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
