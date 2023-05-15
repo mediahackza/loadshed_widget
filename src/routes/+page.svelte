@@ -1,4 +1,6 @@
 <script>
+  // https://gist.github.com/mbostock/3019563https://gist.github.com/mbostock/3019563
+
   import '../styles.css'
   import { scaleLinear } from 'd3-scale'
   import { timeParse, timeFormat } from 'd3-time-format'
@@ -54,6 +56,7 @@
   $: innerHeight = height - (padding.top + padding.bottom)
 
   $: yScale = scaleLinear().domain([0, 4000]).range([10, innerHeight])
+  // scaleBand
 
   $: colorScale = scaleLinear().domain([0, 4000]).range(['#D3BE00', '#E31A1D'])
 
