@@ -28,7 +28,7 @@
 
   
   let padding = {
-    top: 10,
+    top: 20,
     right: 10,
     bottom: 10,
     left: 10,
@@ -129,7 +129,7 @@
 
       {#each promise as point}
         <rect
-          y={height - yScale(+point.hours)}
+          y={height - padding.bottom - yScale(+point.hours)}
           x={xScale(point.year)}
           width={xScale.bandwidth()}
           height={yScale(+point.hours)}
@@ -142,10 +142,10 @@
           dominant-baseline="text-bottom"
           style="fill: #ffffff; font-size: 10px;"
           x={xScale(point.year) + xScale.bandwidth()/2}
-          y={height - yScale(+point.hours) - padding.top }
+          y={height - yScale(+point.hours) - 15 }
           >{Math.ceil(+point.hours).toLocaleString()}</text
         >
-        <text class="label" x="20" y={height + padding.bottom*2+ 2}
+        <text class="label" x="20" y={height + padding.bottom + 5}
           >Hours of active loadshedding</text>
 
         <text
@@ -153,7 +153,7 @@
           dominant-baseline="text-bottom"
           class="axis axis-x"
           x={xScale(point.year) + xScale.bandwidth()/2}
-          y={height + padding.bottom}>{formateDate(point.year)}</text
+          y={height}>{formateDate(point.year)}</text
         >
       {/each}
     </svg>
