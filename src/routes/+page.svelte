@@ -86,9 +86,13 @@
     date_form = '20' + date_form
     return date_form
   }
+
+  $: console.log(height)
+
 </script>
 
-<div class="container" bind:clientWidth={width}>
+
+<div class="container" bind:clientWidth={width} style="height: {width}px">
   {#if promise.length > 0}
   <div class="head-wrap" style="background: {colors[+stage]} !important;">
     {#if +stage === 6}
@@ -111,7 +115,7 @@
     Last update: <span class="highlight">{latestDate}</span>
   </div>
 
-  <div class="chart-wrap">
+  <div class="chart-wrap" bind:clientHeight={height}>
     <svg class="chart" {width} {height}>
       <!-- Define the gradient -->
       <!-- <linearGradient id="myGradient" x1="0" y1="0" x2="0" y2="1"> -->
@@ -173,7 +177,8 @@
     background-color: #fff;
     min-width: 250px;
     max-width: 600px;
-    height: 300px;
+    min-height: 250px;
+    max-height: 600px;
     padding: 0px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
@@ -224,7 +229,10 @@
   .chart-wrap {
     margin-bottom: 10px;
     margin-top: 10px;
-    transform: translate(4px, 0px);
+    /* padding: 10px; */
+    /* padding-bottom: 20px; */
+    /* transform: translate(4px, 0px); */
+    height: calc(100% - 150px);
   }
   .stage-block * {
     display: inline-block;
